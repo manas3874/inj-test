@@ -102,11 +102,11 @@ const pubKey = await getPublicKeyFromKeplr(ChainId.Testnet)
   accountNumber: baseAccount.accountNumber,
 })
 
-const directSignResponse = await window.keplr.getOfflineSigner(ChainId.Testnet).signDirect(
-  injectiveAddress,
-  signDoc,
-)
-const txRaww = getTxRawFromTxRawOrDirectSignResponse(directSignResponse)
+// const directSignResponse = await window.keplr.getOfflineSigner(ChainId.Testnet).signDirect(
+//   injectiveAddress,
+//   signDoc,
+// )
+// const txRaww = getTxRawFromTxRawOrDirectSignResponse(directSignResponse)
 const txHash = await broadcastTx(ChainId.Testnet, txRaw)
 const response = await new TxRestClient(restEndpoint).fetchTxPoll(txHash)
         setTxHash(txHash);
