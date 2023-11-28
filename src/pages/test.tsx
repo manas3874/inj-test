@@ -11,6 +11,7 @@ import {
   TxRestClient,
   BroadcastMode,
   createCosmosSignDocFromSignDoc,
+  SIGN_DIRECT,
 } from "@injectivelabs/sdk-ts";
 import {
   DEFAULT_STD_FEE,
@@ -37,11 +38,10 @@ const InjectiveTxPage = () => {
       };
 
       const broadcastTx = async (chainId, txRaw) => {
-        const keplr = await getKeplr(ChainId.Testnet);
         const result = await window.keplr.sendTx(
           chainId,
           CosmosTxV1Beta1Tx.TxRaw.encode(txRaw).finish(),
-          BroadcastMode.Sync
+          'sync'
         );
 
         if (!result || result.length === 0) {
@@ -53,13 +53,10 @@ const InjectiveTxPage = () => {
 
         return Buffer.from(result).toString("hex");
       };
-      const getPublicKeyFromKeplr = async (chainId) => {
-        const key = await window.keplr.getKey(chainId);
-
-        return Buffer.from(key.pubKey).toString("base64");
-      };
-      const injectiveAddress = "inj1udj57jjtd4vmp9l99v29wu75xshumvqz5vsk0c";
-      const chainId = "injective-888"; /* ChainId.Mainnet */
+      const chainId = ChainId.Testnet
+      const {key, offlineSigner} = await getKeplr(chainId)
+      const pubKey = Buffer.from(key.pubKey).toString("base64");
+      const injectiveAddress = key.bech32Address;
       const restEndpoint = getNetworkEndpoints(
         Network.Testnet
       ).rest; /* getNetworkEndpoints(Network.Mainnet).rest */
@@ -91,29 +88,29 @@ const InjectiveTxPage = () => {
         dstInjectiveAddress: "inj17xxadj7e9ermxnq7jl5t2zxu5pknhahac8ma8e",
       });
 
-      /** Get the PubKey of the Signer from the Wallet/Private Key */
-      const pubKey = await getPublicKeyFromKeplr(ChainId.Testnet);
-
       try {
-        const {  signDoc } = createTransaction({
+        const { signDoc } = createTransaction({
           pubKey,
           chainId,
           fee: DEFAULT_STD_FEE,
+          signMode: SIGN_DIRECT,
           message: [msg],
           sequence: baseAccount.sequence,
           timeoutHeight: timeoutHeight.toNumber(),
           accountNumber: baseAccount.accountNumber,
         });
 
-        const directSignResponse = await window.keplr.getOfflineSigner(ChainId.Testnet).signDirect(
+        const directSignResponse = await offlineSigner.signDirect(
           injectiveAddress,
           createCosmosSignDocFromSignDoc(signDoc),
         )
-        const txRaww = getTxRawFromTxRawOrDirectSignResponse(directSignResponse)
-        const txHash = await broadcastTx(ChainId.Testnet, txRaww);
+        const txRaw = getTxRawFromTxRawOrDirectSignResponse(directSignResponse)
+        const txHash = await broadcastTx(ChainId.Testnet, txRaw);
+        console.log({txHash})
         const response = await new TxRestClient(restEndpoint).fetchTxPoll(
           txHash
         );
+        console.log({response})
         setTxHash(txHash);
       } catch (error) {
         console.error("Error executing transaction:", error);
