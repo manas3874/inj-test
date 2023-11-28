@@ -13,7 +13,6 @@ import {
   TxRestClient,
 } from "@injectivelabs/sdk-ts";
 import {
-  // DEFAULT_STD_FEE,
   BigNumberInBase,
   DEFAULT_BLOCK_TIMEOUT_HEIGHT,
 } from "@injectivelabs/utils";
