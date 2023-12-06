@@ -12,6 +12,7 @@
     "@cosmjs/proto-signing": "^0.32.0",
     "@cosmjs/stargate": "^0.32.0",
     "@injectivelabs/sdk-ts": "^1.14.4",
+    "@injectivelabs/wallet-ts": "^1.14.4",
     "next": "14.0.3",
     "react": "^18",
     "react-dom": "^18"
