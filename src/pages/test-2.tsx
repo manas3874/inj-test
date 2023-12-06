@@ -17,28 +17,6 @@ export const msgBroadcastClient = new MsgBroadcaster({
   walletStrategy /* instantiated wallet strategy */,
   network: Network.Testnet,
 });
-// (
-//   // Usage Example
-//   async () => {
-//     const signer = "inj1udj57jjtd4vmp9l99v29wu75xshumvqz5vsk0c";
-
-//     const msg = MsgSend.fromJSON({
-//       amount: {
-//         denom: "inj",
-//         amount: new BigNumberInBase(0.01).toWei().toFixed(),
-//       },
-//       srcInjectiveAddress: signer,
-//       dstInjectiveAddress: "inj1...",
-//     });
-
-//     // Prepare + Sign + Broadcast the transaction using the Wallet Strategy
-//     await msgBroadcastClient.broadcast({
-//       injectiveAddress: signer,
-//       msgs: msg,
-//     });
-//   }
-// )();
-
 function Test() {
   console.log("walletStrategy", walletStrategy);
   async function run() {

@@ -18,8 +18,9 @@ import {
   DEFAULT_BLOCK_TIMEOUT_HEIGHT,
   BigNumberInBase,
 } from "@injectivelabs/utils";
-import { ChainId, } from "@injectivelabs/ts-types";
+import { ChainId } from "@injectivelabs/ts-types";
 import { Network, getNetworkEndpoints } from "@injectivelabs/networks";
+import { walletStrategy } from "./test-2";
 
 const InjectiveTxPage = () => {
   const [txHash, setTxHash] = useState("");
@@ -40,7 +41,7 @@ const InjectiveTxPage = () => {
       const result = await window.keplr.sendTx(
         chainId,
         CosmosTxV1Beta1Tx.TxRaw.encode(txRaw).finish(),
-        'sync'
+        "sync"
       );
 
       if (!result || result.length === 0) {
@@ -52,8 +53,8 @@ const InjectiveTxPage = () => {
 
       return Buffer.from(result).toString("hex");
     };
-    const chainId = ChainId.Testnet
-    const {key, offlineSigner} = await getKeplr(chainId)
+    const chainId = ChainId.Testnet;
+    const { key, offlineSigner } = await getKeplr(chainId);
     const pubKey = Buffer.from(key.pubKey).toString("base64");
     const injectiveAddress = key.bech32Address;
     const restEndpoint = getNetworkEndpoints(
@@ -101,16 +102,23 @@ const InjectiveTxPage = () => {
 
       const directSignResponse = await offlineSigner.signDirect(
         injectiveAddress,
-        createCosmosSignDocFromSignDoc(signDoc),
-      )
-      const txRaw = getTxRawFromTxRawOrDirectSignResponse(directSignResponse)
-      const txHash = await broadcastTx(ChainId.Testnet, txRaw);
-      console.log({txHash})
-      const response = await new TxRestClient(restEndpoint).fetchTxPoll(
-        txHash
+        createCosmosSignDocFromSignDoc(signDoc)
       );
-      console.log({response})
-      setTxHash(txHash);
+      const txRaw = getTxRawFromTxRawOrDirectSignResponse(directSignResponse);
+      const response = await walletStrategy.signCosmosTransaction({
+        txRaw,
+        accountNumber: baseAccount.accountNumber,
+        chainId: "injective-888",
+        address: injectiveAddress,
+      });
+      console.log("response", response);
+      // const txHash = await broadcastTx(ChainId.Testnet, txRaw);
+      // console.log({txHash})
+      // const response = await new TxRestClient(restEndpoint).fetchTxPoll(
+      //   txHash
+      // );
+      // console.log({response})
+      // setTxHash(txHash);
     } catch (error) {
       console.error("Error executing transaction:", error);
     }
@@ -126,4 +134,4 @@ const InjectiveTxPage = () => {
 };
 
 export default InjectiveTxPage;
-``
+``;
